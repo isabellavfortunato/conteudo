@@ -1,0 +1,1851 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Calendário de stories, julho</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --marinho:#15213b; --marinho2:#1d2c4a; --vinho:#7d1538; --laranja:#c14a2b;
+    --creme:#ece4d6; --creme2:#f4efe5; --tinta:#1c1c22; --cinza:#6b6256;
+    --verde:#3f6b54; --pre-bg:#e7eee8; --vivo-bg:#f6e2d8; --grava-bg:#efdde3;
+  }
+  *{box-sizing:border-box}
+  body{margin:0;background:var(--creme2);color:var(--tinta);font-family:'Inter',system-ui,sans-serif;line-height:1.5}
+  .wrap{max-width:980px;margin:0 auto;padding:0 16px 64px}
+
+  header.top{background:var(--marinho);color:var(--creme);padding:34px 0 26px;margin-bottom:8px}
+  header.top .in{max-width:980px;margin:0 auto;padding:0 16px}
+  .eyebrow{font-family:'Oswald';font-weight:500;letter-spacing:.28em;text-transform:uppercase;font-size:12px;color:var(--laranja);margin:0 0 10px}
+  h1{font-family:'Oswald';font-weight:700;font-size:clamp(30px,6vw,46px);line-height:1.02;margin:0 0 8px;text-transform:uppercase;letter-spacing:.01em}
+  .sub{font-size:15px;color:#c9cedb;max-width:60ch;margin:0}
+
+  .ribbon{display:flex;flex-wrap:wrap;gap:10px 22px;margin-top:20px;padding-top:18px;border-top:1px solid rgba(236,228,214,.16)}
+  .rib{font-size:12.5px;color:#c9cedb;display:flex;align-items:center;gap:7px}
+  .dot{width:11px;height:11px;border-radius:3px;display:inline-block}
+  .dot.pre{background:#8fb39c} .dot.vivo{background:var(--laranja)} .dot.grava{background:#b97089}
+
+  .hours{display:flex;flex-wrap:wrap;gap:8px;margin-top:14px}
+  .hour{font-family:'Oswald';font-size:12px;letter-spacing:.04em;background:rgba(236,228,214,.1);border:1px solid rgba(236,228,214,.18);padding:5px 10px;border-radius:999px;color:var(--creme)}
+  .hour b{color:var(--laranja);font-weight:600}
+
+  nav.tabs{position:sticky;top:0;z-index:20;background:var(--creme2);padding:12px 0;display:flex;gap:8px;flex-wrap:wrap;border-bottom:1px solid #e0d8c8;margin-bottom:18px}
+  nav.tabs .in{max-width:980px;margin:0 auto;padding:0 16px;display:flex;gap:8px;flex-wrap:wrap;width:100%}
+  .tab{font-family:'Oswald';font-weight:500;font-size:13px;letter-spacing:.03em;border:1px solid #d8cdb8;background:#fff;color:var(--marinho);padding:8px 13px;border-radius:999px;cursor:pointer;transition:.15s}
+  .tab:hover{border-color:var(--laranja)}
+  .tab.active{background:var(--marinho);color:var(--creme);border-color:var(--marinho)}
+  .filter{margin-left:auto;display:flex;gap:8px;align-items:center}
+  .fchip{font-family:'Oswald';font-size:12px;letter-spacing:.03em;border:1px solid #d8cdb8;background:#fff;color:var(--cinza);padding:7px 12px;border-radius:999px;cursor:pointer}
+  .fchip.active{background:var(--vinho);color:#fff;border-color:var(--vinho)}
+
+  .wk-title{font-family:'Oswald';font-weight:600;font-size:14px;letter-spacing:.16em;text-transform:uppercase;color:var(--vinho);margin:26px 0 12px;padding-left:2px}
+  .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:16px}
+  @media(max-width:720px){.grid{grid-template-columns:1fr}}
+
+  .day{background:#fff;border:1px solid #e7dfce;border-radius:14px;overflow:hidden;display:flex;flex-direction:column}
+  .day-h{display:flex;align-items:center;gap:12px;padding:14px 16px 12px;border-bottom:1px solid #efe7d8;flex-wrap:wrap}
+  .date{display:flex;align-items:baseline;gap:4px;font-family:'Oswald'}
+  .dnum{font-size:30px;font-weight:700;line-height:1;color:var(--marinho)}
+  .dmes{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--cinza)}
+  .dinfo{display:flex;flex-direction:column;gap:3px}
+  .dow{font-family:'Oswald';font-size:13px;letter-spacing:.1em;text-transform:uppercase;color:var(--tinta)}
+  .appear{font-size:10.5px;font-weight:600;letter-spacing:.04em;padding:2px 7px;border-radius:999px;width:fit-content}
+  .appear.yes{background:var(--grava-bg);color:var(--vinho)}
+  .appear.no{background:var(--pre-bg);color:var(--verde)}
+  .mk{margin-left:auto;text-align:right;font-family:'Oswald';font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--laranja);display:flex;flex-direction:column}
+  .mk-d{font-family:'Inter';font-size:10.5px;letter-spacing:0;text-transform:none;color:var(--cinza)}
+
+  .reels{display:flex;gap:10px;padding:14px 16px 6px}
+  @media(max-width:380px){.reels{flex-direction:column}}
+  .reel{flex:1;background:var(--creme2);border:1px solid #ece3d2;border-radius:10px;padding:10px 11px}
+  .reel.anchor{background:var(--marinho);border-color:var(--marinho)}
+  .reel-h .rt{font-family:'Oswald';font-size:10.5px;letter-spacing:.08em;text-transform:uppercase;color:var(--cinza)}
+  .reel.anchor .rt{color:var(--laranja)}
+  .rtitle{font-size:13px;font-weight:600;margin-top:5px;color:var(--tinta)}
+  .reel.anchor .rtitle{color:var(--creme)}
+  .rtheme{font-size:11px;margin-top:4px;color:var(--cinza)}
+  .reel.anchor .rtheme{color:#aeb6c6}
+
+  .arc-label{font-family:'Oswald';font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--vinho);padding:12px 16px 2px}
+  .stories{padding:4px 16px 16px;display:flex;flex-direction:column}
+  .st{display:flex;gap:12px;padding:10px 0;border-top:1px solid #f2ebdb}
+  .st:first-child{border-top:none}
+  .st-h{font-family:'Oswald';font-weight:600;font-size:13px;color:var(--marinho);width:42px;flex:none;padding-top:1px}
+  .st-b{flex:1;min-width:0}
+  .st-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .papel{font-family:'Oswald';font-weight:600;font-size:12.5px;letter-spacing:.04em;text-transform:uppercase;color:var(--tinta)}
+  .tag{font-size:10px;font-weight:600;letter-spacing:.03em;padding:2px 7px;border-radius:999px}
+  .tag.pre{background:var(--pre-bg);color:var(--verde)}
+  .tag.vivo{background:var(--vivo-bg);color:var(--laranja)}
+  .tag.grava{background:var(--grava-bg);color:var(--vinho)}
+  .fmt{font-size:11.5px;color:var(--cinza);margin-top:2px}
+  .txt{font-size:13px;color:var(--tinta);margin-top:4px}
+
+  .hidden{display:none !important}
+  footer{text-align:center;color:var(--cinza);font-size:12px;margin-top:34px}
+.backlink{display:inline-block;font-family:'Oswald';font-weight:500;font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:#c9cedb;text-decoration:none;margin:0 0 14px}
+  .backlink:hover{color:var(--laranja)}
+
+  .st-check{display:flex;gap:16px;margin-top:10px;padding-top:9px;border-top:1px dashed #d8cdb8}
+  .st-check label{display:flex;align-items:center;gap:6px;font-family:'Oswald';font-weight:500;font-size:11px;letter-spacing:.05em;text-transform:uppercase;color:var(--cinza);cursor:pointer;user-select:none}
+  .st-check input{width:15px;height:15px;accent-color:var(--verde);cursor:pointer}
+  .st.done{opacity:.5}
+  .st.done .txt{text-decoration:line-through}
+  .sync-pill{display:inline-block;margin-top:12px;font-family:'Oswald';font-weight:500;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--laranja)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="in">
+    <a class="backlink" href="index.html">‹ voltar para a central</a>
+    <p class="eyebrow">Isabella Fortunato</p>
+    <h1>Calendário de stories, julho</h1>
+    <p class="sub">Dois reels por dia e um arco de quatro tempos focado no reel âncora. Começa em 1º de julho de 2026. Três stories saem pré-agendados pelo Buffer e só a enquete pede a sua mão ao vivo no almoço.</p>
+    <div class="ribbon">
+      <span class="rib"><span class="dot pre"></span>pré-agendado, sai sozinho</span>
+      <span class="rib"><span class="dot vivo"></span>ao vivo, você cola o adesivo</span>
+      <span class="rib"><span class="dot grava"></span>grava antes, recorte no rosto</span>
+    </div>
+    <div class="hours">
+      <span class="hour"><b>09:00</b> reel âncora + fisgar</span>
+      <span class="hour"><b>10:30</b> desenvolver</span>
+      <span class="hour"><b>13:00</b> reel da tarde + interagir</span>
+      <span class="hour"><b>15:30</b> direcionar</span>
+    </div>
+  </div>
+</header>
+
+<nav class="tabs">
+  <div class="in">
+    <button class="tab active" data-tab="all">Mês inteiro</button>
+    <button class="tab" data-tab="1">Sem. 1</button>
+    <button class="tab" data-tab="2">Sem. 2</button>
+    <button class="tab" data-tab="3">Sem. 3</button>
+    <button class="tab" data-tab="4">Sem. 4</button>
+    <button class="tab" data-tab="5">Sem. 5</button>
+    <div class="filter"><button class="fchip" id="soPre">Só os dias sem aparecer</button></div>
+  </div>
+</nav>
+
+<div class="wrap">
+  <section class="week" data-week="1"><h2 class="wk-title">Semana 1 · 1 a 5 jul</h2><div class="grid">
+    <article class="day" data-week="1" data-appear="0">
+      <header class="day-h">
+        <div class="date"><span class="dnum">01</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">quarta</span><span class="appear no">sem aparecer</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Os cinco números que você olha toda semana</div>
+          <div class="rtheme">Financeiro</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Respira antes de responder no impulso</div>
+          <div class="rtheme">TDAH e cabeça</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu olhava o extrato e não sabia dizer se o mês tinha sido bom.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Print ou gravação de tela</div>
+          <div class="txt">Mostro os cinco números que escolhi para olhar toda semana e como peço ao Claude para puxar eles do meu controle.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Você sabe de cabeça quanto entrou essa semana? Sei ou não faço ideia.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="1" data-appear="0">
+      <header class="day-h">
+        <div class="date"><span class="dnum">02</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">quinta</span><span class="appear no">sem aparecer</span></div>
+        <span class="mk">POV<span class="mk-d">Trilho à parte, vídeo curto para viralizar</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Atende muito, cobra pouco e não lucra</div>
+          <div class="rtheme">Financeiro</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">A empresária de dia e estudante de noite, com o NotebookLM</div>
+          <div class="rtheme">IA no dia a dia</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu vivia com a agenda cheia e mesmo assim não sobrava no fim do mês.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Print ou gravação de tela</div>
+          <div class="txt">Mostro como peço ao Claude para abrir quanto cada serviço deixa de verdade depois dos custos.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, quiz colada ao vivo</div>
+          <div class="txt">A sua agenda vive cheia e mesmo assim falta dinheiro? Sim ou não.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="1" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">03</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">sexta</span><span class="appear yes">você aparece</span></div>
+        <span class="mk">Carrossel de ensino<span class="mk-d">Trilho à parte, tema deslocado</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">A amiga acha caro, a cliente certa não</div>
+          <div class="rtheme">Precificação</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Antes de pegar esse empréstimo, responde três coisas</div>
+          <div class="rtheme">Financeiro</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">A minha amiga achou caro e eu quase baixei o preço na hora.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto por que quem acha caro quase nunca é a cliente que eu quero atender.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Você já baixou o seu preço por causa de um comentário de conhecido? Já ou nunca.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="1" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">04</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">sábado</span><span class="appear yes">você aparece</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Como eu burlo o meu TDAH quando travo na tarefa mais importante</div>
+          <div class="rtheme">TDAH e cabeça</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Quanto cada venda deixa para pagar as suas contas</div>
+          <div class="rtheme">Financeiro</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu sentava para fazer a tarefa mais importante e travava.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto o jeito que encontrei para destravar, jogando a tarefa no Claude e pedindo só o primeiro passo bem pequeno.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, caixinha colada ao vivo</div>
+          <div class="txt">Qual a tarefa que você mais empurra com a barriga?</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="1" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">05</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">domingo</span><span class="appear yes">você aparece</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Por que se imaginar lá no topo te trava</div>
+          <div class="rtheme">TDAH e cabeça</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">O dinheiro que a empresa precisa ter para rodar</div>
+          <div class="rtheme">Financeiro</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu me imaginava lá no topo e em vez de animar, eu travava.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto como sonhar grande demais me paralisava, e como voltei o foco para o passo da semana.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Pensar no objetivo grande te anima ou te trava?</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article></div></section><section class="week" data-week="2"><h2 class="wk-title">Semana 2 · 6 a 12 jul</h2><div class="grid">
+    <article class="day" data-week="2" data-appear="0">
+      <header class="day-h">
+        <div class="date"><span class="dnum">06</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">segunda</span><span class="appear no">sem aparecer</span></div>
+        <span class="mk">POV<span class="mk-d">Trilho à parte, vídeo curto para viralizar</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Acompanhar e projetar o mês em vez de torcer</div>
+          <div class="rtheme">Previsibilidade e caixa</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">O aplicativo de orações e estudos que o Claude criou para mim</div>
+          <div class="rtheme">IA no dia a dia</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Todo fim de mês eu era pega de surpresa pelo caixa.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Print ou gravação de tela</div>
+          <div class="txt">Mostro como projeto as próximas semanas com o Claude, em vez de torcer para dar certo.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, quiz colada ao vivo</div>
+          <div class="txt">Você sabe como vai estar o seu caixa daqui a quatro semanas? Sei ou não faço ideia.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="2" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">07</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">terça</span><span class="appear yes">você aparece</span></div>
+        <span class="mk">Carrossel de verdade<span class="mk-d">Trilho à parte, reforça o tema da semana</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">O dia em que entendi que precisava de gestão</div>
+          <div class="rtheme">Bastidores e histórias</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">O pacote segura cliente e dá dinheiro previsível</div>
+          <div class="rtheme">Precificação</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Teve um dia em que eu entendi que não dava para tocar tudo de cabeça.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto a virada, o dia em que parei de improvisar e comecei a organizar a empresa de verdade.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, caixinha colada ao vivo</div>
+          <div class="txt">Qual a parte mais bagunçada da sua empresa hoje?</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar · Consultoria</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame da Consultoria Expressa</div>
+          <div class="txt">Na Consultoria Expressa, em duas horas a gente resolve uma dessas. Comenta consultoria.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="2" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">08</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">quarta</span><span class="appear yes">você aparece</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Perdi um prazo, levei um processo e o Claude me tirou do buraco</div>
+          <div class="rtheme">IA no dia a dia</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Régua de cobrança com a IA</div>
+          <div class="rtheme">Cobrança e inadimplência</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu perdi um prazo e aquilo virou um processo na minha mão.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto o aperto e como o Claude me ajudou a organizar a resposta e sair do buraco.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, caixinha colada ao vivo</div>
+          <div class="txt">Qual papel burocrático você está empurrando agora?</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="2" data-appear="0">
+      <header class="day-h">
+        <div class="date"><span class="dnum">09</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">quinta</span><span class="appear no">sem aparecer</span></div>
+        <span class="mk">POV<span class="mk-d">Trilho à parte, vídeo curto para viralizar</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Dívida boa e dívida ruim</div>
+          <div class="rtheme">Financeiro</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Gravar um vídeo dá muito mais trabalho para uns corpos do que para outros</div>
+          <div class="rtheme">Bastidores e histórias</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu achava que toda dívida era sinal de que eu tinha falhado.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Print ou gravação de tela</div>
+          <div class="txt">Mostro a diferença entre a dívida que trabalha por você e a que só te afunda, com um exemplo simples.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Para você dívida é sempre fracasso? Sim ou nem sempre.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="2" data-appear="0">
+      <header class="day-h">
+        <div class="date"><span class="dnum">10</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">sexta</span><span class="appear no">sem aparecer</span></div>
+        <span class="mk">Carrossel de ensino<span class="mk-d">Trilho à parte, tema deslocado</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">A ordem certa das tarefas é a da sua energia</div>
+          <div class="rtheme">TDAH e cabeça</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Você não precisa de curso de Claude</div>
+          <div class="rtheme">IA na prática, negócio e conteúdo</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu fazia o checklist e mesmo assim não cumpria o checklist.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Print ou gravação de tela</div>
+          <div class="txt">Mostro a lista do dia já na ordem da minha energia, do jeito que o Claude monta para mim.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">O seu checklist você cumpre ou ele vira enfeite?</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="2" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">11</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">sábado</span><span class="appear yes">você aparece</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Cobrar barato atrai a pior cliente</div>
+          <div class="rtheme">Precificação</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">O seu negócio é de compra que se repete ou de compra pontual</div>
+          <div class="rtheme">Previsibilidade e caixa</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Os meus clientes mais baratos sempre foram os que mais me deram trabalho.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto por que o preço baixo costuma atrair justamente a cliente mais difícil.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, quiz colada ao vivo</div>
+          <div class="txt">O seu cliente mais barato é o que mais te dá trabalho? Sim ou não.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="2" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">12</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">domingo</span><span class="appear yes">você aparece</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Cobrança bem feita não humilha</div>
+          <div class="rtheme">Cobrança e inadimplência</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Em uma tarde a sua bagunça de cliente vira uma base organizada</div>
+          <div class="rtheme">CRM com o Claude</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu tinha tanta vergonha de cobrar que deixava o dinheiro na mão dos outros.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto como aprendi a cobrar sem me sentir mal e sem perder a cliente.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Você sente vergonha de cobrar quem te deve? Sinto ou não.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article></div></section><section class="week" data-week="3"><h2 class="wk-title">Semana 3 · 13 a 19 jul</h2><div class="grid">
+    <article class="day" data-week="3" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">13</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">segunda</span><span class="appear yes">você aparece</span></div>
+        <span class="mk">POV<span class="mk-d">Trilho à parte, vídeo curto para viralizar</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">A dor conhecida que te prende</div>
+          <div class="rtheme">Papo de empresa, sem o Claude</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Sair da pressa</div>
+          <div class="rtheme">Mentalidade de dona de negócio</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu preferia a bagunça que eu já conhecia a mudar e me arriscar.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto como a dor conhecida parece confortável e por que ela te mantém parada.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, caixinha colada ao vivo</div>
+          <div class="txt">Qual a dor da sua empresa que você já se acostumou a aguentar?</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="3" data-appear="0">
+      <header class="day-h">
+        <div class="date"><span class="dnum">14</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">terça</span><span class="appear no">sem aparecer</span></div>
+        <span class="mk">Carrossel de verdade<span class="mk-d">Trilho à parte, reforça o tema da semana</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Pró-labore e lucro, você é a primeira a receber</div>
+          <div class="rtheme">Financeiro</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">O cliente sumiu e você travou</div>
+          <div class="rtheme">Previsibilidade e caixa</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu pagava todo mundo e sobrava o resto para mim, quando sobrava.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Print ou gravação de tela</div>
+          <div class="txt">Mostro como passei a me pagar primeiro, com o pró-labore separado do lucro.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, quiz colada ao vivo</div>
+          <div class="txt">Você se paga um valor fixo ou só tira da empresa quando precisa?</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar · Curso</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">É isso que eu ensino passo a passo no curso. Comenta curso.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="3" data-appear="0">
+      <header class="day-h">
+        <div class="date"><span class="dnum">15</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">quarta</span><span class="appear no">sem aparecer</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">O antes e depois de uma consultoria</div>
+          <div class="rtheme">Bastidores e histórias</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Uma conversa só para o iPhone e os meus atalhos</div>
+          <div class="rtheme">IA no dia a dia</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Olha o que mudou na empresa de quem parou para organizar.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Print ou gravação de tela</div>
+          <div class="txt">Mostro um resultado de verdade de antes e depois, sem prometer milagre.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, caixinha colada ao vivo</div>
+          <div class="txt">O que você mais quer organizar na sua empresa esse mês?</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="3" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">16</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">quinta</span><span class="appear yes">você aparece</span></div>
+        <span class="mk">POV<span class="mk-d">Trilho à parte, vídeo curto para viralizar</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">O que você chama de burrice e cabeça de vento tem nome</div>
+          <div class="rtheme">TDAH e cabeça</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">O contador você não substitui pela IA</div>
+          <div class="rtheme">IA na prática, negócio e conteúdo</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Por anos eu me achei burra e distraída sem saber o que era.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto o dia em que descobri que aquilo tinha nome e parei de me culpar.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Você já se chamou de burra por esquecer as coisas? Já ou nunca.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="3" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">17</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">sexta</span><span class="appear yes">você aparece</span></div>
+        <span class="mk">Carrossel de ensino<span class="mk-d">Trilho à parte, tema deslocado</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Dona, mãe, esposa e funcionária</div>
+          <div class="rtheme">Mentalidade de dona de negócio</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Os custos invisíveis que comem o seu lucro</div>
+          <div class="rtheme">Precificação</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu era dona, mãe, esposa e ainda a funcionária que fazia tudo.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto como eu acumulava todos os papéis e o que começou a mudar quando separei eles.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Você sente que faz todos os papéis dentro da sua empresa? Sim ou não.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="3" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">18</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">sábado</span><span class="appear yes">você aparece</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Histórias de quem quase desistiu</div>
+          <div class="rtheme">Bastidores e histórias</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Organizar quem te deve</div>
+          <div class="rtheme">Cobrança e inadimplência</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Teve uma época em que eu quase larguei tudo.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto o momento em que pensei em desistir e o que me fez continuar.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, caixinha colada ao vivo</div>
+          <div class="txt">Você já pensou em desistir da sua empresa? Me conta.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="3" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">19</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">domingo</span><span class="appear yes">você aparece</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">O perfeccionismo é medo do fracasso disfarçado</div>
+          <div class="rtheme">Papo de empresa, sem o Claude</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Eu pesquisei fornecedor, medida e preço de um produto inteiro com o Claude</div>
+          <div class="rtheme">IA no dia a dia</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu já engavetei vídeo por achar que não estava bom o bastante.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto como o perfeccionismo é o medo de errar com nome bonito e como ele me travava.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Você já deixou de postar por medo do que iam achar? Já ou nunca.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article></div></section><section class="week" data-week="4"><h2 class="wk-title">Semana 4 · 20 a 26 jul</h2><div class="grid">
+    <article class="day" data-week="4" data-appear="0">
+      <header class="day-h">
+        <div class="date"><span class="dnum">20</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">segunda</span><span class="appear no">sem aparecer</span></div>
+        <span class="mk">POV<span class="mk-d">Trilho à parte, vídeo curto para viralizar</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">A reserva que sai como um boleto</div>
+          <div class="rtheme">Financeiro</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Eu analiso os perfis que bombam com a extensão do Claude</div>
+          <div class="rtheme">IA na prática, negócio e conteúdo</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu nunca conseguia guardar dinheiro porque o que sobrava sempre sumia.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Print ou gravação de tela</div>
+          <div class="txt">Mostro como passei a tratar a reserva como um boleto que a empresa se paga todo mês.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, quiz colada ao vivo</div>
+          <div class="txt">Você guardou alguma reserva esse ano? Guardei ou nada.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="4" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">21</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">terça</span><span class="appear yes">você aparece</span></div>
+        <span class="mk">Carrossel de verdade<span class="mk-d">Trilho à parte, reforça o tema da semana</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Você se sente uma fraude mesmo com resultado na mão</div>
+          <div class="rtheme">TDAH e cabeça</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Quando o cliente pede desconto</div>
+          <div class="rtheme">Precificação</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu dava certo e mesmo assim me sentia uma fraude.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto como o resultado aparecia e a sensação de impostora continuava.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, caixinha colada ao vivo</div>
+          <div class="txt">Você já sentiu que o seu sucesso foi só sorte? Me conta.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar · Consultoria</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame da Consultoria Expressa</div>
+          <div class="txt">Na Consultoria Expressa, em duas horas a gente resolve uma dessas. Comenta consultoria.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="4" data-appear="0">
+      <header class="day-h">
+        <div class="date"><span class="dnum">22</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">quarta</span><span class="appear no">sem aparecer</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Conhecer o seu mínimo viável por mês</div>
+          <div class="rtheme">Previsibilidade e caixa</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">O sistema pronto é difícil porque ele não foi feito para você</div>
+          <div class="rtheme">CRM com o Claude</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu não sabia quanto a minha empresa precisava fazer para sobreviver no mês.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Print ou gravação de tela</div>
+          <div class="txt">Mostro como descobri o meu mínimo por mês com o Claude, o número que me dá paz.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, quiz colada ao vivo</div>
+          <div class="txt">Você sabe o seu mínimo por mês para as contas fecharem? Sei ou não faço ideia.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="4" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">23</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">quinta</span><span class="appear yes">você aparece</span></div>
+        <span class="mk">POV<span class="mk-d">Trilho à parte, vídeo curto para viralizar</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Cada post é um experimento, não um veredito</div>
+          <div class="rtheme">Papo de empresa, sem o Claude</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Pedi dez perfis da minha área ao Claude e vieram só mulheres brancas</div>
+          <div class="rtheme">Bastidores e histórias</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu travava porque achava que cada vídeo precisava ser um acerto.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto como parei de tratar cada post como um veredito sobre mim.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Você posta com medo de errar? Sim ou às vezes.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="4" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">24</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">sexta</span><span class="appear yes">você aparece</span></div>
+        <span class="mk">Carrossel de ensino<span class="mk-d">Trilho à parte, tema deslocado</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Vergonha de cobrar</div>
+          <div class="rtheme">Cobrança e inadimplência</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">As despesas, onde você ganha ou perde dinheiro</div>
+          <div class="rtheme">Financeiro</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">A minha vergonha de cobrar estava no bolso dos outros.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto como a vergonha me fazia deixar de cobrar quem já tinha sumido.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Você tem alguém te devendo agora e não cobrou por vergonha? Tenho ou não.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="4" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">25</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">sábado</span><span class="appear yes">você aparece</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Você não tira férias porque os pagamentos dependem só de você</div>
+          <div class="rtheme">Mentalidade de dona de negócio</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Eu sei o dia exato que o meu remédio vai acabar</div>
+          <div class="rtheme">IA no dia a dia</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu não tirava férias porque tudo dependia só de mim.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto como a empresa girava toda em torno de mim e o primeiro passo para soltar um pouco.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Você consegue tirar férias da sua empresa? Consigo ou nem pensar.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="4" data-appear="0">
+      <header class="day-h">
+        <div class="date"><span class="dnum">26</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">domingo</span><span class="appear no">sem aparecer</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Garantir parte do dinheiro antes do mês começar</div>
+          <div class="rtheme">Previsibilidade e caixa</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Por que o mesmo conteúdo bomba no Instagram e morre no TikTok</div>
+          <div class="rtheme">IA na prática, negócio e conteúdo</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu começava todo mês do zero, sem nada garantido.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Print ou gravação de tela</div>
+          <div class="txt">Mostro como passei a garantir parte do dinheiro antes do mês começar.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, quiz colada ao vivo</div>
+          <div class="txt">Quanto você já tem garantido para o próximo mês? Já sei ou nada.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article></div></section><section class="week" data-week="5"><h2 class="wk-title">Semana 5 · 27 a 31 jul</h2><div class="grid">
+    <article class="day" data-week="5" data-appear="0">
+      <header class="day-h">
+        <div class="date"><span class="dnum">27</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">segunda</span><span class="appear no">sem aparecer</span></div>
+        <span class="mk">POV<span class="mk-d">Trilho à parte, vídeo curto para viralizar</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">O follow-up que você esquece o Claude faz por você</div>
+          <div class="rtheme">CRM com o Claude</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Olhe o preço da concorrência, mas não copie</div>
+          <div class="rtheme">Precificação</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu perdia venda quase fechada só porque esquecia de voltar na pessoa.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Print ou gravação de tela</div>
+          <div class="txt">Mostro como o Claude faz o follow-up que eu sempre esquecia.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, caixinha colada ao vivo</div>
+          <div class="txt">Quantas vendas quase fechadas você deixou esfriar?</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="5" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">28</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">terça</span><span class="appear yes">você aparece</span></div>
+        <span class="mk">Carrossel de verdade<span class="mk-d">Trilho à parte, reforça o tema da semana</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Mulher com TDAH produz tanto quanto qualquer uma</div>
+          <div class="rtheme">TDAH e cabeça</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Eu não consigo ver dinheiro parado na conta</div>
+          <div class="rtheme">Financeiro</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Me disseram a vida toda que eu não rendia, e era mentira.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto como toco a empresa com TDAH e produzo tanto quanto qualquer uma.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Você sente que precisa render como os outros para se provar? Sim ou não.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar · Curso</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">É isso que eu ensino passo a passo no curso. Comenta curso.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="5" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">29</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">quarta</span><span class="appear yes">você aparece</span></div>
+        
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Não nasci para números é desculpa</div>
+          <div class="rtheme">Provocações e mitos para quebrar</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">Plano B para o sucesso também</div>
+          <div class="rtheme">Produtividade</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Eu me escondia atrás do não nasci para números.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto como essa frase me custava caro e como o Claude me tirou desse medo dos números.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Você foge dos números da sua empresa? Fujo ou encaro.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="5" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">30</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">quinta</span><span class="appear yes">você aparece</span></div>
+        <span class="mk">POV<span class="mk-d">Trilho à parte, vídeo curto para viralizar</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">O conselho que mudou o meu negócio</div>
+          <div class="rtheme">Bastidores e histórias</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">O Claude acha o remédio mais barato na farmácia perto de você</div>
+          <div class="rtheme">IA no dia a dia</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Um conselho de poucos minutos mudou o rumo da minha empresa.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto qual foi o conselho e por que ele mexeu com tudo.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, caixinha colada ao vivo</div>
+          <div class="txt">Qual foi o melhor conselho que você já recebeu sobre o seu negócio?</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article>
+    <article class="day" data-week="5" data-appear="1">
+      <header class="day-h">
+        <div class="date"><span class="dnum">31</span><span class="dmes">jul</span></div>
+        <div class="dinfo"><span class="dow">sexta</span><span class="appear yes">você aparece</span></div>
+        <span class="mk">Carrossel de ensino<span class="mk-d">Trilho à parte, tema deslocado</span></span>
+      </header>
+      <div class="reels">
+        <div class="reel anchor">
+          <div class="reel-h"><span class="rt">09:00 · reel âncora</span></div>
+          <div class="rtitle">Está sem dinheiro essa semana</div>
+          <div class="rtheme">Cobrança e inadimplência</div>
+        </div>
+        <div class="reel">
+          <div class="reel-h"><span class="rt">13:00 · reel da tarde</span></div>
+          <div class="rtitle">A cliente comprou do concorrente porque você demorou a responder</div>
+          <div class="rtheme">CRM com o Claude</div>
+        </div>
+      </div>
+      <div class="arc-label">Arco de stories, focado no reel âncora</div>
+      <div class="stories">
+      <div class="st">
+        <div class="st-h">09:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Fisgar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Texto no frame vinho</div>
+          <div class="txt">Quando a cliente diz que está sem dinheiro, eu congelava.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">10:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Desenvolver</span><span class="tag grava">grava antes</span></div>
+          <div class="fmt">Vídeo seu, recorte fechado no rosto</div>
+          <div class="txt">Conto como passei a responder essa frase sem perder a cliente e sem abrir mão do meu.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">13:00</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Interagir</span><span class="tag vivo">ao vivo</span></div>
+          <div class="fmt">Frame creme, enquete colada ao vivo</div>
+          <div class="txt">Você já ouviu que estão sem dinheiro na hora de pagar? Já ou nunca.</div>
+        </div>
+      </div>
+      <div class="st">
+        <div class="st-h">15:30</div>
+        <div class="st-b">
+          <div class="st-top"><span class="papel">Direcionar</span><span class="tag pre">pré-agendado</span></div>
+          <div class="fmt">Frame post do dia</div>
+          <div class="txt">O reel âncora de hoje está no meu perfil, arrasta para ver.</div>
+        </div>
+      </div></div>
+    </article></div></section>
+  <footer>Calendário de stories de julho · 31 dias · arco de quatro tempos · frames vinho, creme e post do dia</footer>
+</div>
+
+<script>
+  const tabs=document.querySelectorAll('.tab');
+  const weeks=document.querySelectorAll('.week');
+  let soPre=false;
+  function apply(tab){
+    weeks.forEach(w=>{
+      const show = (tab==='all'||w.dataset.week===tab);
+      w.classList.toggle('hidden',!show);
+    });
+    document.querySelectorAll('.day').forEach(d=>{
+      const hideByAppear = soPre && d.dataset.appear==='1';
+      d.classList.toggle('hidden',hideByAppear);
+    });
+  }
+  let current='all';
+  tabs.forEach(t=>t.addEventListener('click',()=>{
+    tabs.forEach(x=>x.classList.remove('active'));t.classList.add('active');
+    current=t.dataset.tab;apply(current);
+  }));
+  document.getElementById('soPre').addEventListener('click',function(){
+    soPre=!soPre;this.classList.toggle('active',soPre);apply(current);
+  });
+</script>
+<script type="module">
+(async () => {
+  const state = new Set();
+  document.querySelectorAll('article.day').forEach(day=>{
+    const dn=((day.querySelector('.dnum')||{}).textContent||'').trim();
+    const dm=((day.querySelector('.dmes')||{}).textContent||'').trim();
+    day.querySelectorAll('.st').forEach((st,i)=>{
+      const id=dn+dm+'-'+(i+1); st.dataset.sid=id;
+      const box=document.createElement('div'); box.className='st-check';
+      box.innerHTML='<label><input type="checkbox" data-k="sg-'+id+'"> gravado</label><label><input type="checkbox" data-k="sp-'+id+'"> postado</label>';
+      st.appendChild(box);
+    });
+  });
+  const note=document.createElement('span'); note.className='sync-pill'; note.id='stSync'; note.textContent='Carregando\u2026';
+  const hin=document.querySelector('header.top .in'); if(hin) hin.appendChild(note);
+  function apply(){
+    document.querySelectorAll('.st-check input').forEach(cb=>{ cb.checked=state.has(cb.dataset.k); });
+    document.querySelectorAll('.st').forEach(st=>{ st.classList.toggle('done', state.has('sp-'+st.dataset.sid)); });
+  }
+  let save=async()=>{};
+  function useLocal(){
+    try{ JSON.parse(localStorage.getItem('stories-marcado')||'[]').forEach(x=>state.add(x)); }catch(e){}
+    save=async(k,on)=>{ if(on)state.add(k); else state.delete(k); try{ localStorage.setItem('stories-marcado', JSON.stringify([...state].filter(x=>x.indexOf('sg-')===0||x.indexOf('sp-')===0))); }catch(e){} };
+    apply();
+  }
+  let cfg=null;
+  try{ ({ firebaseConfig: cfg } = await import('./config.js')); }catch(e){}
+  const useFB = cfg && cfg.apiKey && cfg.apiKey.indexOf('COLE')!==0;
+  if(useFB){
+    try{
+      const { initializeApp } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js");
+      const { getFirestore, doc, onSnapshot, setDoc, deleteField } = await import("https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js");
+      const app=initializeApp(cfg); const db=getFirestore(app); const ref=doc(db,'estado','calendario');
+      onSnapshot(ref,(snap)=>{ const d=snap.data()||{}; state.clear(); Object.keys(d).forEach(k=>{ if(d[k]&&(k.indexOf('sg-')===0||k.indexOf('sp-')===0)) state.add(k); }); apply(); }, ()=>{ note.textContent='Erro de conexao'; });
+      save=async(k,on)=>{ await setDoc(ref,{[k]:on?true:deleteField()},{merge:true}); };
+      note.textContent='Sincronizado entre dispositivos';
+    }catch(e){ note.textContent='Salvo neste aparelho'; useLocal(); }
+  } else { note.textContent='Salvo neste aparelho'; useLocal(); }
+  document.addEventListener('change', async e=>{
+    const t=e.target; if(!t.matches('.st-check input')) return;
+    const k=t.dataset.k; if(t.checked) state.add(k); else state.delete(k);
+    const st=t.closest('.st'); if(st) st.classList.toggle('done', state.has('sp-'+st.dataset.sid));
+    await save(k, t.checked);
+  });
+})();
+</script>
+</body>
+</html>
